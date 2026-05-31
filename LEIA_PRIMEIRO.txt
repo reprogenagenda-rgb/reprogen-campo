@@ -1,0 +1,35 @@
+REPROGEN CENTRAL V5.3.3 — DATA/HORA LOCAL PROTEGIDA
+
+Arquivo pronto para subir no GitHub Pages:
+- index.html
+
+O que foi preservado:
+- Painel
+- Avaliação
+- Novos cadastros
+- Notas
+- Estoque
+- Propriedades
+- Cochos
+- Lotes
+- Produtos
+- Movimentação
+- Registros
+- Mapa com tipos: Padrão, Satélite, Topográfico, Claro e Sem base
+- Configuração da URL do Apps Script
+
+O que foi corrigido:
+- Central passa a priorizar dataHoraBR > dataHoraLocal > dataHora
+- Exibição visual em DD/MM/AAAA HH:mm
+- Mapa não usa new Date() para exibir data/hora do manejo
+- Cálculo de dias do mapa usa parser local protegido
+- Exportação usa hora local, não UTC
+
+Importante:
+- Primeiro atualize e reimplante o Apps Script V1.1.
+- Depois suba este index.html na Central.
+- Registros antigos que já entraram com +3h não são corrigidos automaticamente.
+- Teste com registro novo após atualizar o Apps Script.
+
+Mensagem de commit sugerida:
+Atualiza Central V5.3.3 com data e hora local protegida
