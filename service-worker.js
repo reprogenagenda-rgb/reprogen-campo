@@ -1,43 +1,66 @@
-/* REPROGEN CAMPO PWA V1.0 - service worker (app shell offline-first) */
-var CACHE = 'reprogen-campo-pwa-v1';
+/* REPROGEN CAMPO PWA - service worker corrigido
+   Cache app-shell offline-first para GitHub Pages em subpasta.
+*/
+var CACHE = 'reprogen-campo-pwa-v1-20260530';
 var ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './icons/icon-512-maskable.png'
 ];
 
-self.addEventListener('install', function(e){
+self.addEventListener('install', function(event) {
   self.skipWaiting();
-  e.waitUntil(
-    caches.open(CACHE).then(function(c){ return c.addAll(ASSETS); })
+  event.waitUntil(
+    caches.open(CACHE).then(function(cache) {
+      return cache.addAll(ASSETS);
+    })
   );
 });
 
-self.addEventListener('activate', function(e){
-  e.waitUntil(
-    caches.keys().then(function(keys){
-      return Promise.all(keys.map(function(k){
-        if (k !== CACHE) { return caches.delete(k); }
+self.addEventListener('activate', function(event) {
+  event.waitUntil(
+    caches.keys().then(function(keys) {
+      return Promise.all(keys.map(function(key) {
+        if (key !== CACHE) {
+          return caches.delete(key);
+        }
       }));
-    }).then(function(){ return self.clients.claim(); })
+    }).then(function() {
+      return self.clients.claim();
+    })
   );
 });
 
-self.addEventListener('fetch', function(e){
-  if (e.request.method !== 'GET') { return; }
-  e.respondWith(
-    caches.match(e.request).then(function(hit){
-      if (hit) { return hit; }
-      return fetch(e.request).then(function(res){
+self.addEventListener('fetch', function(event) {
+  if (event.request.method !== 'GET') { return; }
+
+  event.respondWith(
+    caches.match(event.request).then(function(cached) {
+      if (cached) { return cached; }
+
+      return fetch(event.request).then(function(response) {
+        if (!response || response.status !== 200) { return response; }
+
         try {
-          var copy = res.clone();
-          caches.open(CACHE).then(function(c){ c.put(e.request, copy); });
+          var copy = response.clone();
+          caches.open(CACHE).then(function(cache) {
+            cache.put(event.request, copy);
+          });
         } catch (err) {}
-        return res;
-      }).catch(function(){
-        return caches.match('./index.html');
+
+        return response;
+      }).catch(function() {
+        if (event.request.mode === 'navigate' ||
+            (event.request.headers.get('accept') || '').indexOf('text/html') !== -1) {
+          return caches.match('./index.html');
+        }
+        return new Response('', {
+          status: 504,
+          statusText: 'Offline'
+        });
       });
     })
   );
