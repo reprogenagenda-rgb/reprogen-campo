@@ -1,15 +1,19 @@
 {
-  "name": "REPROGEN Campo",
+  "name": "REPROGEN CAMPO",
   "short_name": "REPROGEN",
-  "description": "App de campo para manejo reprodutivo bovino e bubalino (D0, IATF, DG, DG FINAL, MN, Concept Plus). Offline-first.",
+  "description": "App de campo REPROGEN para manejo reprodutivo bovino, D0, IATF, DG, monta natural, auditoria e relatórios.",
+  "id": "./",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0f1012",
-  "theme_color": "#0f1012",
-  "lang": "pt-BR",
-  "dir": "ltr",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "categories": [
+    "productivity",
+    "business",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "./icons/icon-192.png",
