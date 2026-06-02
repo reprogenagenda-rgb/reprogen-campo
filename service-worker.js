@@ -1,8 +1,8 @@
 // REPROGEN CAMPO — Service Worker PWA
+// V07: correção do bug de script visível no rodapé.
 // Compatível com GitHub Pages, Android e iOS.
-// Quando atualizar o app, mude o CACHE_NAME para forçar atualização no celular.
 
-const CACHE_NAME = 'reprogen-campo-pwa-v1-20260601-05-final-index';
+const CACHE_NAME = 'reprogen-campo-pwa-v1-20260601-07-script-visual-corrigido';
 
 const APP_FILES = [
   './',

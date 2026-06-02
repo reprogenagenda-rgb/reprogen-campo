@@ -1,0 +1,32 @@
+DIAGNÓSTICO BUG VISUAL — V07
+
+Sintoma observado:
+O código JavaScript do registro do Service Worker apareceu escrito no rodapé do app.
+
+Causa provável:
+O fechamento final </body> foi quebrado na versão anterior, deixando parte do script fora de uma tag <script> válida.
+
+Correção aplicada:
+- Não mexi no final do HTML.
+- Não injetei script novo no body.
+- Usei o index original enviado como base.
+- Atualizei apenas o <head> real para manifest, iOS e ícones.
+- Atualizei o service-worker.js com novo cache.
+
+Validação:
+- O index final termina com </html>: True
+- Quantidade de serviceWorker.register: 1
+- Quantidade de link manifest: 1
+- Referências ./icons/: 3
+- Final do arquivo preservado:
+le.log){ console.log('[PWA] SW ativo', reg.scope); }
+      }).catch(function(err){
+        if(window.console && console.warn){ console.warn('[PWA] Falha SW', err); }
+      });
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

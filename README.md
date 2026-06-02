@@ -1,23 +1,14 @@
-# REPROGEN CAMPO — PWA FINAL
+# REPROGEN CAMPO — PWA V07
 
-Pacote final pronto para GitHub Pages.
+Correção do bug em que o código do Service Worker aparecia visualmente no rodapé do app.
 
-## Estrutura
+Causa:
+- A rotina anterior mexeu no final do HTML.
+- O index do REPROGEN tem biblioteca XLSX inline e textos internos com </body>.
+- Isso pode quebrar a posição do fechamento real do body.
 
-- index.html
-- manifest.json
-- service-worker.js
-- .nojekyll
-- logo-reprogen-reenquadrada.png
-- README.md
-- LEIA_PRIMEIRO.txt
-- COMO_SUBIR_NO_GITHUB.txt
-- icons/
-  - icon-192.png
-  - icon-512.png
-  - icon-512-maskable.png
-
-## Importante
-
-Este pacote já contém o index.html atualizado.
-Não precisa colar snippet manual.
+Correção V07:
+- index reconstruído a partir do original enviado.
+- Somente o HEAD real foi atualizado.
+- O final do HTML foi preservado.
+- Service worker recebeu novo CACHE_NAME para forçar atualização.

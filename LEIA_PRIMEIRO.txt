@@ -1,14 +1,24 @@
-LEIA PRIMEIRO — REPROGEN CAMPO PWA FINAL
+LEIA PRIMEIRO — REPROGEN CAMPO PWA V07
 
-Este pacote já está pronto para subir no GitHub.
-O arquivo index.html já foi atualizado com:
-- manifest.json;
-- ícones Apple/iOS;
-- suporte Android;
-- registro do service-worker.js;
-- caminhos para a pasta icons/.
+Este pacote corrige o erro em que o código JavaScript aparecia na tela do app.
 
-Suba a pasta icons inteira e todos os arquivos da raiz.
+Suba para a raiz do GitHub:
+- index.html
+- manifest.json
+- service-worker.js
+- .nojekyll
+- README.md
+- LEIA_PRIMEIRO.txt
+- COMO_SUBIR_NO_GITHUB.txt
+- DIAGNOSTICO_BUG_VISUAL.txt
+- logo-reprogen-reenquadrada.png
+- icons/
 
-Não suba arquivo de snippet.
-Não precisa editar manualmente o index.html.
+Mensagem de commit:
+Corrige script visivel no app e atualiza PWA V07
+
+Após subir:
+1. Aguarde o GitHub Pages atualizar.
+2. Apague o app antigo da tela inicial, se já instalou.
+3. No Chrome, limpe dados do site se continuar aparecendo versão velha.
+4. Abra pelo link github.io.

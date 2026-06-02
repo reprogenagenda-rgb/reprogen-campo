@@ -1,37 +1,20 @@
-COMO SUBIR NO GITHUB.COM — REPROGEN CAMPO PWA FINAL
+COMO SUBIR A CORREÇÃO V07
 
-1. Abra o repositório no GitHub.
+1. No GitHub, entre no repositório reprogen-campo.
 2. Clique em Add file > Upload files.
-3. Arraste todos os arquivos deste pacote para a raiz do repositório.
-4. Confirme que ficaram na raiz:
-   - index.html
-   - manifest.json
-   - service-worker.js
-   - .nojekyll
-   - README.md
-   - LEIA_PRIMEIRO.txt
-   - COMO_SUBIR_NO_GITHUB.txt
-   - logo-reprogen-reenquadrada.png
-   - pasta icons/
-5. Não envie a pasta compactada ZIP para dentro do repositório.
-6. Faça commit com a mensagem:
-   Atualiza REPROGEN CAMPO PWA final com index completo e logo oficial
-7. Vá em Settings > Pages.
-8. Configure:
-   Source: Deploy from a branch
-   Branch: main
-   Folder: /root
-9. Abra o link github.io gerado.
-10. Android:
-    Chrome > três pontos > Instalar app.
-11. iOS:
-    Safari > Compartilhar > Adicionar à Tela de Início.
-12. PC:
-    Chrome/Edge > ícone de instalação na barra de endereço, quando disponível.
+3. Arraste todos os arquivos extraídos deste pacote.
+4. Confirme que a pasta icons/ foi junto.
+5. Faça commit com:
+   Corrige script visivel no app e atualiza PWA V07
+6. Aguarde 1 a 3 minutos.
+7. Abra o link github.io.
+8. Se o celular mostrar versão antiga:
+   - remova o app antigo da tela inicial;
+   - limpe cache/dados do site;
+   - abra novamente pelo github.io.
 
-CRITÉRIO DE APROVAÇÃO
-- O app abre pelo link github.io.
-- O ícone aparece correto.
-- Android mostra Instalar app ou Adicionar à tela inicial.
-- iOS adiciona à tela inicial pelo Safari.
-- Após abrir uma vez online, o app reabre offline.
+Critério de aprovação:
+- não aparecer código JavaScript no rodapé;
+- abrir abas D0, IATF, DG, M. Natural e Base;
+- ícone aparecer ao adicionar na tela inicial;
+- funcionar offline após primeiro acesso online.
