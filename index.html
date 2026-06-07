@@ -9,26 +9,33 @@
   - Acompanham este arquivo: manifest.json, service-worker.js, icons/.
   O historico completo informa; a calculadora do dia opera.
 -->
+
+<!--
+  REPROGEN CAMPO PWA V1.0.2 — STATUS PELA IATF VIGENTE
+  Regra (Tomaz Maia): nao se faz IATF nova sem DG anterior -> a IATF VIGENTE (mais recente
+  por data) define o status; DG anterior vira historico. Codigos de campo:
+  1=prenha; 0=vazia; 0D=vazia+DESCARTE; 0B=vazia+BOI; branco/SDG/FALTOU/N VEIO = PENDENTE.
+  A correcao roda no momento da importacao da planilha Concept Plus.
+  Injetada DENTRO do IIFE do app (store/importRowsCP sao locais, nao estao em window).
+  ES5 puro. Desligar: REPROGEN_FORCE_VIGENTE_OFF (no escopo) — nao usar normalmente.
+-->
+
 <meta charset="UTF-8">
-<!-- REPROGEN PWA — Android, iOS e GitHub Pages -->
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#000000">
-<meta name="background-color" content="#000000">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="application-name" content="REPROGEN CAMPO">
-
-<!-- Manifest PWA -->
-<link rel="manifest" href="./manifest.json">
-
-<!-- iOS / iPhone / iPad -->
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="REPROGEN CAMPO">
+<meta name="theme-color" content="#0f1012">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="./icons/icon-192.png">
-<link rel="apple-touch-icon" sizes="192x192" href="./icons/icon-192.png">
-<link rel="apple-touch-icon" sizes="512x512" href="./icons/icon-512.png">
-
-<title>REPROGEN CAMPO</title>
+<meta name="apple-mobile-web-app-title" content="Reprogen">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+<link rel="shortcut icon" type="image/x-icon" href="icons/favicon.ico">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512x512.png">
+<link rel="apple-touch-icon" href="icons/icon-180x180.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192x192.png">
+<title>REPROGEN CAMPO PWA V1.0.2</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <script>/* XLSX.js 0.18.5 — inline offline */
 /*! xlsx.js (C) 2013-present SheetJS -- http://sheetjs.com */
@@ -395,7 +402,7 @@ tr:last-child td{border-bottom:none}
 <body>
 
 <div class="topbar">
-  <div><div class="logo">REPROGEN</div><div class="ver">PWA V1.0</div></div>
+  <div><div class="logo">REPROGEN</div><div class="ver">PWA V1.0.2</div></div>
   <div class="kpis">
     <div class="kchip"><span>TOTAL</span><b id="kTotal">0</b></div>
     <div class="kchip"><span>DG PEND</span><b id="kPend">0</b></div>
@@ -800,6 +807,27 @@ tr:last-child td{border-bottom:none}
 
 <!-- ══ BASE ══ -->
 <div id="pane-base" class="pane">
+  <!-- ☁️ PAINEL NUVEM — FASE 1 (HTML estático, JS wired abaixo) -->
+  <div id="cloud-panel" style="margin:12px 0;padding:14px;background:#0a0e1a;border:1px solid #3a4060;border-radius:8px;font-size:13px;color:#ccc;">
+    <div style="font-weight:900;color:#f4a228;margin-bottom:10px;font-size:14px;">&#9729;&#65039; NUVEM <span style="font-size:10px;color:#555;font-weight:400">(Fase 1 &#8212; Sync Manual)</span></div>
+    <label style="font-size:11px;color:#888;display:block;margin-bottom:2px">URL Supabase</label>
+    <input id="cloud-url" type="text" placeholder="https://xxxxx.supabase.co" style="width:100%;padding:7px;background:#111;color:#0f0;border:1px solid #2a2e3e;border-radius:4px;font-family:monospace;font-size:12px;margin-bottom:8px">
+    <label style="font-size:11px;color:#888;display:block;margin-bottom:2px">Chave An&ocirc;nima</label>
+    <input id="cloud-key" type="password" placeholder="sb_publishable_..." style="width:100%;padding:7px;background:#111;color:#0f0;border:1px solid #2a2e3e;border-radius:4px;font-family:monospace;font-size:12px;margin-bottom:8px">
+    <label style="font-size:11px;color:#888;display:block;margin-bottom:2px">Fazenda</label>
+    <input id="cloud-farm" type="text" placeholder="ex: CHAO PRETO" style="width:100%;padding:7px;background:#111;color:#0f0;border:1px solid #2a2e3e;border-radius:4px;margin-bottom:8px">
+    <label style="font-size:11px;color:#888;display:block;margin-bottom:2px">Operador</label>
+    <input id="cloud-op" type="text" placeholder="seu nome" style="width:100%;padding:7px;background:#111;color:#0f0;border:1px solid #2a2e3e;border-radius:4px;margin-bottom:10px">
+    <div style="display:flex;gap:6px;margin-bottom:6px">
+      <button id="btn-cloud-save" onclick="window.reprogenCloudSave&&window.reprogenCloudSave()" style="flex:1;padding:9px;background:#2a6600;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:12px;font-weight:700">&#128190; Salvar Config</button>
+      <button id="btn-cloud-test" onclick="window.reprogenCloudTest&&window.reprogenCloudTest()" style="flex:1;padding:9px;background:#004488;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:12px;font-weight:700">&#128246; Testar</button>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button id="btn-cloud-push" onclick="window.reprogenCloudPush&&window.reprogenCloudPush()" style="flex:1;padding:10px;background:#f4a228;color:#000;border:none;border-radius:5px;cursor:pointer;font-size:13px;font-weight:900">&#128228; Enviar p/ Nuvem</button>
+      <button id="btn-cloud-pull" onclick="window.reprogenCloudPull&&window.reprogenCloudPull()" style="flex:1;padding:10px;background:#0099ff;color:#000;border:none;border-radius:5px;cursor:pointer;font-size:13px;font-weight:900">&#128229; Baixar da Nuvem</button>
+    </div>
+  </div>
+
 
   <!-- Import JSON/CSV próprio -->
   <div class="import-note">
@@ -4048,6 +4076,99 @@ wireProtocolHints();
 
 if(byId('d0Id'))byId('d0Id').focus();
 renderAll();
+
+/* ===================================================================
+   REPROGEN V1.0.2 — RECALCULO DE STATUS PELA IATF VIGENTE
+   Injetado dentro do IIFE: usa store/importRowsCP/pf/normId/normDF por nome.
+   Roda apos cada importacao Concept Plus, recontando o status de cada
+   matriz pela IATF mais recente (vigente). DG anterior vira historico.
+   =================================================================== */
+function reprogenClassifyDG(raw){
+  var u=String(raw==null?'':raw).toUpperCase().replace(/^\s+|\s+$/g,'');
+  if(u==='1'||u==='PRENHA'||u==='GESTANTE'||u==='POSITIVO')return{res:'prenha',dest:'',pend:false,nota:''};
+  if(u==='0'||u==='VAZIA'||u==='NEGATIVO')return{res:'vazia',dest:'',pend:false,nota:''};
+  if(u==='0D')return{res:'vazia',dest:'descarte',pend:false,nota:'0D'};
+  if(u==='0B')return{res:'vazia',dest:'boi',pend:false,nota:'0B'};
+  if(u==='')return{res:'',dest:'',pend:true,nota:''};
+  return{res:'',dest:'',pend:true,nota:u}; /* SDG, FALTOU, N VEIO, desconhecido -> pendente */
+}
+function reprogenFixVigente(rows){
+  if(!rows||!rows.length||typeof store==='undefined'||!store||!store.animals)return 0;
+  var ID_AL=['id','n femea','n animal','animal','matriz','id animal','n matriz','no matriz','n da matriz','n da matriz individual','numero da matriz','femea','no femea','n brinco','brinco'];
+  var IA_AL=['data da ia','data ia','data iatf','iatf','data inseminacao','data inseminação','data ia iatf'];
+  var ORD_AL=['ordem da iatf','1a 2a ou 3a iatf','1ª 2ª ou 3ª iatf','ordem iatf','1a 2a ou 3a'];
+  var DGF_AL=['dg final','dgfinal','dg final prenha vazia'];
+  var DG30_AL=['dg 30 a 60d','dg30','dg 30 60','dg 30 a 60','dg 30'];
+  var DGG_AL=['dg','situacao','situação','resultado dg','resultado','diagnostico','diagnóstico'];
+  var TOURO_AL=['touro','nome touro','reprodutor'];
+  var PART_AL=['partida','partida semen','partida sêmen','lote semen','lote sêmen'];
+  var INSEM_AL=['inseminador'];
+  var COD_AL=['codigo touro','código touro','codigo','código','cod touro'];
+  var LOTE_AL=['lote iatf','lote','retiro','lote retiro'];
+  function up(v){return String(v==null?'':v).toUpperCase().replace(/^\s+|\s+$/g,'');}
+  function rawDG(row){var a=up(pf(row,DGF_AL));if(a)return a;var b=up(pf(row,DG30_AL));if(b)return b;return up(pf(row,DGG_AL));}
+  var best={},i,row,id,iso,ord,key,n=0,id2;
+  for(i=0;i<rows.length;i++){
+    row=rows[i]; if(!row)continue;
+    id=normId(pf(row,ID_AL)); if(!id)continue;
+    iso=normDF(pf(row,IA_AL));
+    ord=up(pf(row,ORD_AL));
+    key=(iso||'0000-00-00')+'|'+ord;
+    if(!best[id]||key>best[id].key){
+      best[id]={key:key,iso:iso,ord:ord,raw:rawDG(row),
+        touro:String(pf(row,TOURO_AL)||''),partida:String(pf(row,PART_AL)||''),
+        insem:String(pf(row,INSEM_AL)||''),cod:String(pf(row,COD_AL)||''),lote:String(pf(row,LOTE_AL)||'')};
+    }
+  }
+  for(id2 in best){ if(!best.hasOwnProperty(id2))continue;
+    var a=store.animals[id2]; if(!a)continue;
+    var b=best[id2], c=reprogenClassifyDG(b.raw);
+    a.iatf=a.iatf||{}; a.history=a.history||[];
+    if(b.iso)a.iatf.dataIATF=b.iso;
+    if(b.ord){ a.iatf.ordemIATF=(typeof displayOrdemIATF==='function'?displayOrdemIATF(b.ord):b.ord);
+               if(typeof normOrdemIATF==='function')a.iatf.ordemIATFNorm=normOrdemIATF(b.ord); }
+    if(b.touro)a.iatf.touro=b.touro;
+    if(b.partida)a.iatf.partida=b.partida;
+    if(b.insem)a.iatf.inseminador=b.insem;
+    if(b.cod)a.iatf.codigoTouro=b.cod;
+    if(b.lote)a.iatf.lote=b.lote;
+    a.iatf.dgVigenteNota=c.nota||'';
+    if(c.pend){
+      if(a.dg){ a.history.push({type:'DG_ANTERIOR_HISTORICO',at:(typeof nowStamp==='function'?nowStamp():''),resultado_anterior:a.dg.resultado,motivo:'IATF vigente sem DG ('+(c.nota||'branco')+')'}); }
+      a.dg=null;
+    } else {
+      a.dg={resultado:c.res,destino:c.dest,dataDG:(a.dg&&a.dg.dataDG)||'',obs:'DG da IATF vigente (V1.0.2)'+(c.nota?(' ['+c.nota+']'):''),origem:'CONCEPT_PLUS_VIGENTE'};
+    }
+    try{ a.state=inferState(a); }catch(e){}
+    n++;
+  }
+  try{ window.__REPROGEN_VIG_LAST=n; }catch(e){}
+  return n;
+}
+/* Expor p/ um futuro botao "Recalcular" e p/ diagnostico */
+try{ window.reprogenFixVigente=reprogenFixVigente; }catch(e){}
+
+if(typeof importRowsCP==='function' && !importRowsCP._vigente){
+  var _reprogenOrigCP=importRowsCP;
+  importRowsCP=function(rows){
+    var out=_reprogenOrigCP.apply(this,arguments);
+    if(typeof REPROGEN_FORCE_VIGENTE_OFF==='undefined' || !REPROGEN_FORCE_VIGENTE_OFF){
+      try{ var n=reprogenFixVigente(rows);
+           if(n && typeof showMsg==='function') showMsg('\u2713 Status recalculado pela IATF vigente: '+n+' matrizes. 0D=descarte, 0B=boi; branco/SDG/faltou=pendente.','ok'); }catch(e){}
+      try{ if(typeof saveStore==='function') saveStore(); }catch(e){}
+      try{ if(typeof renderKPIs==='function') renderKPIs(); }catch(e){}
+      try{ if(typeof renderAll==='function') renderAll(); }catch(e){}
+      try{
+        var _kp=document.getElementById('kPend'), _kg=document.getElementById('kPreg');
+        var _pend=_kp?_kp.innerHTML:'?', _preg=_kg?_kg.innerHTML:'?';
+        alert('REPROGEN V1.0.2 — IATF VIGENTE\n\nMatrizes recalculadas: '+n+'\nDG PENDENTE agora: '+_pend+'\nPRENHA agora: '+_preg+'\n\n(0D=descarte, 0B=boi; branco/SDG/faltou=pendente)');
+      }catch(e){}
+    }
+    return out;
+  };
+  importRowsCP._vigente=true;
+}
+
 })();
 </script>
 
@@ -5041,15 +5162,128 @@ window.rg25ResumoDia=resumoDia;
 (function(){
   if('serviceWorker' in navigator){
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('./service-worker.js').then(function(reg){
+      navigator.serviceWorker.register('service-worker.js').then(function(reg){
         if(window.console && console.log){ console.log('[PWA] SW ativo', reg.scope); }
       }).catch(function(err){
         if(window.console && console.warn){ console.warn('[PWA] Falha SW', err); }
       });
     });
   }
+
+
+/* ============================================================
+
+/* ===== REPROGEN CLOUD F1 ===== */
+(function(){
+  var _CLS='rg_cloud', _CST='reprogen_v10';
+  function _gcfg(){try{return JSON.parse(localStorage.getItem(_CLS)||'{}');}catch(e){return {};}}
+  function _scfg(c){try{localStorage.setItem(_CLS,JSON.stringify(c));}catch(e){}}
+  function _xb(u){if(!u)return '';while(u.length>0&&u.charAt(u.length-1)==='/'){u=u.slice(0,u.length-1);}return u;}
+  function _hsh(s){var h=5381,j=0;for(j=0;j<s.length;j++){h=(h*33+s.charCodeAt(j))&0x7FFFFFFF;}return h.toString(36);}
+  function _xhr(m,u,hdrs,body,ok,fail){
+    var x=new XMLHttpRequest();
+    x.onload=function(){if(x.status>=200&&x.status<300){ok(x.responseText,x.status);}else{fail(x.status,x.responseText);}};
+    x.onerror=function(){fail(0,'Erro de rede');};
+    x.open(m,u,true);
+    for(var k in hdrs){x.setRequestHeader(k,hdrs[k]);}
+    x.send(body);
+  }
+  function _ah(c){return{'apikey':c.key,'Authorization':'Bearer '+c.key};}
+
+  window.reprogenCloudSave=function(){
+    var c={
+      url:(document.getElementById('cloud-url')||{}).value||'',
+      key:(document.getElementById('cloud-key')||{}).value||'',
+      fazenda:(document.getElementById('cloud-farm')||{}).value||'',
+      operador:(document.getElementById('cloud-op')||{}).value||''
+    };
+    _scfg(c);
+    alert('Config salva!\nFazenda: '+(c.fazenda||'(vazio)')+'\nURL: '+(c.url?'OK':'(vazio)'));
+  };
+
+  window.reprogenCloudTest=function(){
+    var c=_gcfg();
+    if(!c.url||!c.key){alert('Salve a config primeiro!');return;}
+    _xhr('GET',_xb(c.url)+'/rest/v1/reprogen_eventos?select=evento_id&limit=1',_ah(c),null,
+      function(r,s){alert('CONEXAO OK! Status: '+s);},
+      function(s,e){alert('Erro '+s+':\n'+(e||'').slice(0,200));});
+  };
+
+  window.reprogenCloudPush=function(){
+    var c=_gcfg();
+    if(!c.url||!c.key){alert('Salve a config primeiro!');return;}
+    if(!navigator.onLine){alert('Sem conexao!');return;}
+    var raw=localStorage.getItem(_CST);
+    if(!raw){alert('Sem dados locais. Importe a planilha.');return;}
+    var st,an,evs=[],id,a,aid,faz=c.fazenda||'';
+    try{st=JSON.parse(raw);}catch(ex){alert('Erro parse:\n'+ex.message);return;}
+    an=st.animals||{};
+    var ac=Object.keys(an).length;
+    if(ac===0){
+      alert('Animais: 0\nChaves: '+Object.keys(st).join(',')+'\nImporte em modo Historico.');
+      return;
+    }
+    var sid=Object.keys(an)[0], sa=an[sid];
+    for(id in an){
+      if(!an.hasOwnProperty(id)){continue;}
+      a=an[id]; if(!a){continue;}
+      aid=a.id||a.id_visual||id;
+      if(a.d0)  evs.push({evento_id:faz+'|'+aid+'|D0|'+(a.d0.dataD0||'')+'|'+_hsh(JSON.stringify(a.d0)),fazenda:faz,id_animal:aid,tipo:'D0',data_evento:a.d0.dataD0||'',payload:a.d0,operador:c.operador||'',origem:'REPROGEN_CAMPO',dispositivo:'PWA'});
+      if(a.iatf)evs.push({evento_id:faz+'|'+aid+'|IATF|'+(a.iatf.dataIATF||'')+'|'+_hsh(JSON.stringify(a.iatf)),fazenda:faz,id_animal:aid,tipo:'IATF',data_evento:a.iatf.dataIATF||'',payload:a.iatf,operador:c.operador||'',origem:'REPROGEN_CAMPO',dispositivo:'PWA'});
+      if(a.mn)  evs.push({evento_id:faz+'|'+aid+'|MN|'+(a.mn.data||'')+'|'+_hsh(JSON.stringify(a.mn)),fazenda:faz,id_animal:aid,tipo:'MN',data_evento:a.mn.data||'',payload:a.mn,operador:c.operador||'',origem:'REPROGEN_CAMPO',dispositivo:'PWA'});
+      if(a.dg)  evs.push({evento_id:faz+'|'+aid+'|DG|'+(a.dg.dataDG||'')+'|'+_hsh(JSON.stringify(a.dg)),fazenda:faz,id_animal:aid,tipo:'DG',data_evento:a.dg.dataDG||'',payload:a.dg,operador:c.operador||'',origem:'REPROGEN_CAMPO',dispositivo:'PWA'});
+      if(a.parto)evs.push({evento_id:faz+'|'+aid+'|PARTO|'+(a.parto.data||'')+'|'+_hsh(JSON.stringify(a.parto)),fazenda:faz,id_animal:aid,tipo:'PARTO',data_evento:a.parto.data||'',payload:a.parto,operador:c.operador||'',origem:'REPROGEN_CAMPO',dispositivo:'PWA'});
+    }
+    if(evs.length===0){
+      alert('Animais: '+ac+'\nPrimeiro: '+sid+'\nCampos: '+Object.keys(sa||{}).join(',')+'\nevs=0');
+      return;
+    }
+    var hdrs={'apikey':c.key,'Authorization':'Bearer '+c.key,'Content-Type':'application/json','Prefer':'resolution=ignore-duplicates'};
+    _xhr('POST',_xb(c.url)+'/rest/v1/reprogen_eventos',hdrs,JSON.stringify(evs),
+      function(){alert('ENVIADOS!\n'+evs.length+' eventos para a nuvem.');},
+      function(s,e){alert('Erro '+s+':\n'+(e||'').slice(0,200));});
+  };
+
+  window.reprogenCloudPull=function(){
+    var c=_gcfg();
+    if(!c.url||!c.key){alert('Salve a config primeiro!');return;}
+    if(!c.fazenda){alert('Defina a fazenda!');return;}
+    if(!navigator.onLine){alert('Sem conexao!');return;}
+    _xhr('GET',_xb(c.url)+'/rest/v1/reprogen_eventos?fazenda=eq.'+encodeURIComponent(c.fazenda)+'&select=*',_ah(c),null,
+      function(r){
+        var evs,byA={},st2,an2,cnt=0,i,e2,aid2,b;
+        try{evs=JSON.parse(r);}catch(ex){alert('Erro parse:\n'+ex.message);return;}
+        for(i=0;i<evs.length;i++){e2=evs[i];byA[e2.id_animal]=byA[e2.id_animal]||{};byA[e2.id_animal][e2.tipo.toLowerCase()]=e2.payload;}
+        try{st2=JSON.parse(localStorage.getItem(_CST)||'{}');}catch(ex){alert('Erro store:\n'+ex.message);return;}
+        an2=st2.animals||{};
+        for(aid2 in byA){if(!an2[aid2]){continue;}b=byA[aid2];
+          if(b.d0)an2[aid2].d0=b.d0; if(b.iatf)an2[aid2].iatf=b.iatf;
+          if(b.mn)an2[aid2].mn=b.mn; if(b.dg)an2[aid2].dg=b.dg;
+          if(b.parto)an2[aid2].parto=b.parto; cnt++;}
+        st2.animals=an2; localStorage.setItem(_CST,JSON.stringify(st2));
+        alert('ATUALIZADOS!\n'+evs.length+' de '+cnt+' matrizes.\nRecarregando...');
+        location.reload();
+      },
+      function(s,e){alert('Erro '+s+':\n'+(e||'').slice(0,200));});
+  };
+
+  try{
+    var _c=_gcfg(),_u=document.getElementById('cloud-url'),_k=document.getElementById('cloud-key');
+    var _f=document.getElementById('cloud-farm'),_op=document.getElementById('cloud-op');
+    if(_u&&_c.url)_u.value=_c.url; if(_k&&_c.key)_k.value=_c.key;
+    if(_f&&_c.fazenda)_f.value=_c.fazenda; if(_op&&_c.operador)_op.value=_c.operador;
+  }catch(e){}
+})();
+/* ===== FIM CLOUD F1 ===== */
+
 })();
 </script>
+
+
+
+
+
+
 
 </body>
 </html>
